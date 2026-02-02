@@ -1,45 +1,25 @@
-// NOTE: Do NOT add setup() or draw() in this file
-// setup() and draw() live in main.js
-// This file only defines:
-// 1) drawLose() → what the lose screen looks like
-// 2) input handlers → how the player returns to the start screen
-
-// ------------------------------
-// Main draw function for lose screen
-// ------------------------------
-// drawLose() is called from main.js
-// only when currentScreen === "lose"
-function drawLose() {
-  // Red-tinted background to communicate failure
-  background(255, 210, 210);
-
-  fill(0);
+function drawEndScreen() {
+  fill(255);
   textAlign(CENTER, CENTER);
+  textSize(30);
+  text(`ENDING: ${game.ending}`, width / 2, 160);
 
-  // Main message
-  textSize(40);
-  text("You Lose!", width / 2, 300);
+  fill(220);
+  textSize(16);
+  textAlign(CENTER, TOP);
 
-  // Instruction text
-  textSize(20);
-  text("Click or press R to return to Start.", width / 2, 360);
-}
+  let msg = "";
+  if (game.ending === "Overtrained Ending")
+    msg = "You pushed too hard without recovery.";
+  else if (game.ending === "S-Rank Awakening Ending")
+    msg = "Balanced training + recovery. AWAKENED.";
+  else if (game.ending === "Glass Cannon Ending")
+    msg = "Strong… but fragile. Next time rest more.";
+  else if (game.ending === "Healthy Beginner Ending")
+    msg = "Very healthy, but not enough training yet.";
+  else msg = "Steady progress. Keep going.";
 
-// ------------------------------
-// Mouse input for lose screen
-// ------------------------------
-// Any mouse click returns the player to the start screen
-// (no buttons needed for this simple end state)
-function loseMousePressed() {
-  currentScreen = "start";
-}
+  text(msg, width / 2, 220, 760, 200);
 
-// ------------------------------
-// Keyboard input for lose screen
-// ------------------------------
-// R is commonly used for “restart” in games
-function loseKeyPressed() {
-  if (key === "r" || key === "R") {
-    currentScreen = "start";
-  }
+  addButton("Play Again", width / 2 - 120, 400, 240, 55, () => resetGame());
 }

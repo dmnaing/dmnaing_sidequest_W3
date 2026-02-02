@@ -1,8 +1,63 @@
-html, body {
-  margin: 0;
-  padding: 0;
+/* --- Global page look --- */
+:root {
+  --bg1: #070a12;
+  --bg2: #0b1022;
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.65);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  color: var(--text);
+}
+
+/* Smooth dark gradient background */
+body {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      1200px 700px at 20% 10%,
+      rgba(120, 150, 255, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at 80% 70%,
+      rgba(120, 255, 190, 0.1),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+
+/* p5 inserts the canvas; we style it directly */
 canvas {
-  display: block;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    0 0 0 6px rgba(255, 255, 255, 0.02);
+}
+
+/* Optional: small footer if you later add text under canvas */
+.small-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
 }

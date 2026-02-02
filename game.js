@@ -1,128 +1,183 @@
-// NOTE: Do NOT add setup() or draw() in this file
-// setup() and draw() live in main.js
-// This file only defines:
-// 1) drawGame() → what the game screen looks like
-// 2) input handlers → what happens when the player clicks or presses keys
-// 3) helper functions specific to this screen
-
-// ------------------------------
-// Button data
-// ------------------------------
-// This object stores all the information needed to draw
-// and interact with the button on the game screen.
-// Keeping this in one object makes it easier to move,
-// resize, or restyle the button later.
-const gameBtn = {
-  x: 400, // x position (centre of the button)
-  y: 550, // y position (centre of the button)
-  w: 260, // width
-  h: 90, // height
-  label: "PRESS HERE", // text shown on the button
-};
-
-// ------------------------------
-// Main draw function for this screen
-// ------------------------------
-// drawGame() is called from main.js *only*
-// when currentScreen === "game"
-function drawGame() {
-  // Set background colour for the game screen
-  background(240, 230, 140);
-
-  // ---- Title and instructions text ----
-  fill(0); // black text
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("Game Screen", width / 2, 160);
-
-  textSize(18);
-  text(
-    "Click the button (or press ENTER) for a random result.",
-    width / 2,
-    210,
-  );
-
-  // ---- Draw the button ----
-  // We pass the button object to a helper function
-  drawGameButton(gameBtn);
-
-  // ---- Cursor feedback ----
-  // If the mouse is over the button, show a hand cursor
-  // Otherwise, show the normal arrow cursor
-  cursor(isHover(gameBtn) ? HAND : ARROW);
-}
-
-// ------------------------------
-// Button drawing helper
-// ------------------------------
-// This function is responsible *only* for drawing the button.
-// It does NOT handle clicks or game logic.
-function drawGameButton({ x, y, w, h, label }) {
-  rectMode(CENTER);
-
-  // Check if the mouse is hovering over the button
-  // isHover() is defined in main.js so it can be shared
-  const hover = isHover({ x, y, w, h });
-
+function drawHUD() {
+  // top panel
   noStroke();
+  fill(15, 20, 40, 220);
+  rect(0, 0, width, 80);
 
-  // Change button colour when hovered
-  // This gives visual feedback to the player
-  fill(
-    hover
-      ? color(180, 220, 255, 220) // lighter blue on hover
-      : color(200, 220, 255, 190), // normal state
-  );
+  // labels
+  fill(255);
+  textAlign(LEFT, CENTER);
+  textSize(16);
+  text(`Day: ${game.day}/${game.maxDays}`, 20, 22);
+  text(`Level: ${game.level}`, 20, 52);
 
-  // Draw the button rectangle
-  rect(x, y, w, h, 14); // last value = rounded corners
+  // HEALTH BAR
+  const bx = 210,
+    by = 18,
+    bw = 260,
+    bh = 18;
+  fill(255, 255, 255, 30);
+  rect(bx, by, bw, bh, 8);
 
-  // Draw the button text
-  fill(0);
-  textSize(28);
+  const hpW = map(game.health, 0, 100, 0, bw);
+  fill(90, 220, 160, 200); // green-ish
+  rect(bx, by, hpW, bh, 8);
+
+  fill(255);
   textAlign(CENTER, CENTER);
-  text(label, x, y);
-}
+  textSize(12);
+  text(`HEALTH ${game.health}/100`, bx + bw / 2, by + bh / 2);
 
-// ------------------------------
-// Mouse input for this screen
-// ------------------------------
-// This function is called from main.js
-// only when currentScreen === "game"
-function gameMousePressed() {
-  // Only trigger the outcome if the button is clicked
-  if (isHover(gameBtn)) {
-    triggerRandomOutcome();
+  // LEVEL BAR (fake XP progress just for looks)
+  const lx = 210,
+    ly = 46,
+    lw = 260,
+    lh = 14;
+  fill(255, 255, 255, 30);
+  rect(lx, ly, lw, lh, 8);
+
+  // make progress based on day + level
+  const prog = clamp((game.level - 1) * 0.28 + (game.day - 1) * 0.18, 0, 1);
+  fill(120, 190, 255, 200);
+  rect(lx, ly, lw * prog, lh, 8);
+
+  fill(255, 255, 255, 200);
+  textAlign(CENTER, CENTER);
+  textSize(11);
+  text("SYSTEM SYNC", lx + lw / 2, ly + lh / 2);
+
+  // warning text
+  if (game.health <= 20) {
+    fill(255, 130, 130);
+    textAlign(RIGHT, CENTER);
+    textSize(14);
+    text("LOW HEALTH — REST!", width - 20, 52);
   }
 }
 
-// ------------------------------
-// Keyboard input for this screen
-// ------------------------------
-// Allows keyboard-only interaction (accessibility + design)
-function gameKeyPressed() {
-  // ENTER key triggers the same behaviour as clicking the button
-  if (keyCode === ENTER) {
-    triggerRandomOutcome();
-  }
+drawCard(70, 110, width - 140, 190);
+drawCharacterSilhouette(160, 250);
+
+fill(255);
+textAlign(LEFT, CENTER);
+textSize(28);
+text(`Training Plan (Day ${game.day})`, 230, 165);
+
+fill(220);
+textSize(15);
+text("Pick ONE action. Balance growth and recovery.", 230, 205);
+
+function drawHubScreen() {
+  drawHUD();
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(30);
+  text(`Training Plan (Day ${game.day})`, width / 2, 150);
+
+  fill(220);
+  textSize(16);
+  text("Pick ONE action for today.", width / 2, 210);
+
+  addButton("Do Push-ups (+Lvl, -Health)", 120, 360, 250, 55, () =>
+    applyChoice("pushups"),
+  );
+  addButton("Go Run (+Lvl, -More Health)", 390, 360, 280, 55, () =>
+    applyChoice("run"),
+  );
+  addButton("Rest (+Health)", 690, 360, 170, 55, () => applyChoice("rest"));
+}
+function sceneTemplate(title) {
+  drawHUD();
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(30);
+  text(title, width / 2, 150);
+
+  fill(220);
+  textSize(16);
+  textAlign(CENTER, TOP);
+  text(`Level: ${game.level}\nHealth: ${game.health}`, width / 2, 210);
 }
 
-// ------------------------------
-// Game logic: win or lose
-// ------------------------------
-// This function decides what happens next in the game.
-// It does NOT draw anything.
-function triggerRandomOutcome() {
-  // random() returns a value between 0 and 1
-  // Here we use a 50/50 chance:
-  // - less than 0.5 → win
-  // - 0.5 or greater → lose
-  //
-  // You can bias this later, for example:
-  // random() < 0.7 → 70% chance to win
-  if (random() < 0.5) {
-    currentScreen = "win";
-  } else {
-    currentScreen = "lose";
-  }
+function drawPushupsScreen() {
+  sceneTemplate("Push-up Session");
+  addButton("Continue", width / 2 - 110, 400, 220, 55, () => {
+    if (game.health <= 0) computeEnding();
+    else nextDayOrBoss();
+  });
+}
+
+function drawRunScreen() {
+  sceneTemplate("Night Run");
+  addButton("Continue", width / 2 - 110, 400, 220, 55, () => {
+    if (game.health <= 0) computeEnding();
+    else nextDayOrBoss();
+  });
+}
+
+function drawRestScreen() {
+  sceneTemplate("Recovery Day");
+  addButton("Continue", width / 2 - 110, 400, 220, 55, () => nextDayOrBoss());
+}
+
+// Gate ring
+push();
+translate(width / 2, height / 2 + 20);
+noFill();
+stroke(120, 190, 255, 180);
+strokeWeight(6);
+circle(0, 0, 220);
+
+stroke(120, 190, 255, 60);
+strokeWeight(2);
+for (let i = 0; i < 18; i++) {
+  const a = i * (TWO_PI / 18) + frameCount * 0.01;
+  const r1 = 120,
+    r2 = 150;
+  line(cos(a) * r1, sin(a) * r1, cos(a) * r2, sin(a) * r2);
+}
+pop();
+
+fill(255);
+textAlign(CENTER, CENTER);
+textSize(30);
+text("DUNGEON GATE", width / 2, 140);
+
+fill(220);
+textSize(16);
+text("One attempt. Your stats decide your fate.", width / 2, 190);
+
+function drawCharacterSilhouette(x, y) {
+  push();
+  translate(x, y);
+  noStroke();
+  fill(0, 0, 0, 120);
+
+  // shadow blob
+  ellipse(0, 60, 90, 22);
+
+  // body
+  fill(30, 40, 90, 200);
+  rect(-18, 10, 36, 55, 12);
+
+  // head
+  fill(35, 45, 110, 220);
+  circle(0, -5, 34);
+
+  // “cape”
+  fill(20, 25, 60, 200);
+  triangle(-18, 20, -55, 70, -10, 70);
+
+  pop();
+}
+
+function drawCard(x, y, w, h) {
+  noStroke();
+  fill(255, 255, 255, 25);
+  rect(x, y, w, h, 18);
+  stroke(255, 255, 255, 30);
+  strokeWeight(2);
+  noFill();
+  rect(x, y, w, h, 18);
 }
