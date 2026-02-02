@@ -6,7 +6,7 @@ GBDA302 Week 3:Train to Awaken (Side Quest 3 — Branching Interactive Story)
 
 ## Authors
 
-Min Htet Naing/ Dan (21008098)
+Min Htet Naing, dmnaing (21008098)
 
 ---
 
