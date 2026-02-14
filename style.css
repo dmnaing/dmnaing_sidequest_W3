@@ -26,6 +26,7 @@ body {
 body {
   display: grid;
   place-items: center;
+  padding: 22px; /* ✅ gives breathing room on smaller screens */
   background:
     radial-gradient(
       1200px 700px at 20% 10%,
@@ -40,8 +41,20 @@ body {
     linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 
+/* Optional: wrap the canvas in a simple "card" container (if you add one) */
+.canvas-wrap {
+  padding: 14px;
+  border-radius: 22px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
 /* p5 inserts the canvas; we style it directly */
 canvas {
+  display: block; /* ✅ removes tiny baseline gap */
+  max-width: 100%; /* ✅ responsive */
+  height: auto; /* ✅ responsive */
   border-radius: 18px;
   border: 1px solid var(--border);
   background: linear-gradient(
@@ -49,15 +62,5 @@ canvas {
     rgba(255, 255, 255, 0.03),
     rgba(255, 255, 255, 0.01)
   );
-  box-shadow:
-    0 18px 50px rgba(0, 0, 0, 0.55),
-    0 0 0 6px rgba(255, 255, 255, 0.02);
-}
-
-/* Optional: small footer if you later add text under canvas */
-.small-note {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
 }
